@@ -28,11 +28,11 @@ class Player : public Character {
 public:
     int health, maxHealth, meleeDamage, defense, healing;
     bool criticalHit, blocker, lifeSteal, rangedAttack;
-    Player(int _health, int _power) : Character(_health, _power) {
+    Player(int _health, int _power, int _defense, int _healing) : Character(_health, _power) {
         health = maxHealth = _health;
         meleeDamage = _power;
-        defense = 5;
-        healing = 20;
+        defense = _defense;
+        healing = _healing;
         criticalHit = blocker = lifeSteal = rangedAttack = false;
     }
     set<Item> collectedItems;
@@ -144,7 +144,8 @@ public:
 
     void gameStart()
     {
-        Player player(100, 10);
+        //Creating player object
+        Player player(100, 10, 5, 20);
         cout << "Welcome to the Adventure Game!" << endl;
 
         for (int level = 1; level <= 6; level++) {
