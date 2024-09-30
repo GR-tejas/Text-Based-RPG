@@ -1,3 +1,8 @@
+/*Sir I am typing this here because idk how else to communicate with you. 
+The function you mention about generating random numbers will have only one line of code in it i.e. rand() % n, and I would just be replacing that one line of code with the function call.
+I understand that it is a repetition but since it is a single line that is repeating, I dont feel it is necessary to have a seperate function for it.
+If i am wrong, then please do correct me.*/
+
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
@@ -11,6 +16,16 @@ enum class Item {
     Shield, 
     Armour, 
     Bow
+};
+
+enum class EnemyState {
+    ATTACK,
+    DEFEND
+};
+
+enum class PlayerState {
+    ATTACK,
+    HEAL
 };
 
 //Character base class
@@ -28,6 +43,7 @@ class Player : public Character {
 public:
     int health, maxHealth, meleeDamage, defense, healing;
     bool criticalHit, blocker, lifeSteal, rangedAttack;
+    PlayerState state;
     Player(int _health, int _power, int _defense, int _healing) : Character(_health, _power) {
         health = maxHealth = _health;
         meleeDamage = _power;
@@ -114,6 +130,7 @@ public:
 class Enemy : public Character {
 public:
     int health, attackPower;
+    EnemyState state;
 
     Enemy(int _health, int _power) : Character(_health, _power) {
         health = _health;
@@ -182,24 +199,48 @@ public:
             {
             case 1:
             {
-                int damage = player.attack();
-                enemy.health -= damage;
-                if (enemy.health <= 0) enemy.health = 0;
-                cout << "You dealt " << damage << " damage to the enemy. Enemy health: " << enemy.health << endl;
+                player.state = PlayerState::ATTACK;
                 break;
             }
             case 2:
             {
+                player.state = PlayerState::HEAL;
                 player.heal();
                 break;
             }
             }
 
             if (enemy.health > 0) {
-                int damage = enemy.attack() - player.defense;
-                if (damage < 0) damage = 0;
-                player.health -= damage;
-                cout << "Enemy dealt " << damage << " damage to you. Your health: " << player.health << endl;
+                switch (rand() % 3)
+                {
+                case 0:
+                {
+                    enemy.state = EnemyState::DEFEND;
+                    break;
+                }
+                default:
+                {
+                    enemy.state = EnemyState::ATTACK;
+                    int damage = enemy.attack() - player.defense;
+                    if (damage < 0) damage = 0;
+                    player.health -= damage;
+                    if (player.health <= 0) player.health = 0;
+                    cout << "Enemy dealt " << damage << " damage to you. Your health: " << player.health << endl;
+                    break;
+                }
+                }
+            }
+
+            if (enemy.state == EnemyState::DEFEND)
+            {                   
+                cout << "Enemy defended themselves and took no damage" << endl;
+            }
+            else if(player.state == PlayerState::ATTACK)
+            {
+                int damage = player.attack();
+                enemy.health -= damage;
+                if (enemy.health <= 0) enemy.health = 0;
+                cout << "You dealt " << damage << " damage to the enemy. Enemy health: " << enemy.health << endl;
             }
 
             if (player.health <= 0) {
